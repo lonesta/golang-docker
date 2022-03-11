@@ -62,7 +62,7 @@ func (c *Container) Create() error {
 
 	created, err := c.cli.ContainerCreate(c.ctx, config.Config, config.HostConfig, config.NetworkingConfig, config.Platform, config.Name)
 	if err != nil {
-		_ = c.cli.ContainerRemove(context.Background(), created.ID, types.ContainerRemoveOptions{Force: true})
+		_ = c.cli.ContainerRemove(context.TODO(), created.ID, types.ContainerRemoveOptions{Force: true})
 		return err
 	}
 
@@ -76,7 +76,7 @@ func (c *Container) Create() error {
 func (c *Container) Start() error {
 	err := c.cli.ContainerStart(c.ctx, c.containerID, types.ContainerStartOptions{})
 	if err != nil {
-		_ = c.cli.ContainerRemove(context.Background(), c.containerID, types.ContainerRemoveOptions{Force: true})
+		_ = c.cli.ContainerRemove(context.TODO(), c.containerID, types.ContainerRemoveOptions{Force: true})
 		return err
 	}
 
@@ -87,7 +87,7 @@ func (c *Container) Start() error {
 func (c *Container) Events() (<-chan string, <-chan struct{}) {
 	logs := make(chan string)
 	done := make(chan struct{}, 1)
-	waitConditionNotRunning, errChan := c.cli.ContainerWait(context.Background(), c.containerID, container.WaitConditionNotRunning)
+	waitConditionNotRunning, errChan := c.cli.ContainerWait(context.TODO(), c.containerID, container.WaitConditionNotRunning)
 
 	go func() {
 		out, err := c.cli.ContainerLogs(c.ctx, c.containerID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true})
@@ -111,7 +111,7 @@ func (c *Container) Events() (<-chan string, <-chan struct{}) {
 				done <- struct{}{}
 				return
 			case status := <-waitConditionNotRunning:
-				_ = c.cli.ContainerRemove(context.Background(), c.containerID, types.ContainerRemoveOptions{Force: true})
+				_ = c.cli.ContainerRemove(context.TODO(), c.containerID, types.ContainerRemoveOptions{Force: true})
 				switch status.StatusCode {
 				case 137:
 					err = fmt.Errorf("container id: %s stopped manually", c.containerID)
@@ -125,14 +125,14 @@ func (c *Container) Events() (<-chan string, <-chan struct{}) {
 				done <- struct{}{}
 				return
 			case <-c.ctx.Done():
-				err = c.cli.ContainerStop(context.Background(), c.containerID, nil)
+				err = c.cli.ContainerStop(context.TODO(), c.containerID, nil)
 				if err != nil {
 					logs <- err.Error()
 					done <- struct{}{}
 					return
 				}
 
-				err = c.cli.ContainerRemove(context.Background(), c.containerID, types.ContainerRemoveOptions{Force: true})
+				err = c.cli.ContainerRemove(context.TODO(), c.containerID, types.ContainerRemoveOptions{Force: true})
 				if err != nil {
 					logs <- err.Error()
 				}
