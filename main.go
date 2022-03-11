@@ -14,16 +14,9 @@ import (
 func main() {
 	imageName := flag.String("docker-image", "", "A name of a Docker image")
 	bashCommand := flag.String("bash-command", "", "A bash command (to run inside this Docker image)")
-	cloudWatchGroupName := flag.String("cloudwatch-group", "", "A name of an AWS CloudWatch group")
-	cloudWatchStreamName := flag.String("cloudwatch-stram", "", "A name of an AWS CloudWatch stream")
-	cloudWatchRegion := flag.String("aws-region", "", "A name of an AWS region")
-	cloudWatchAccessKeyID := flag.String("aws-access-key-id", "", "Access key id AWS")
-	cloudWatchSecretAccessKey := flag.String("aws-secret-access-key", "", "Secret access key AWS")
 	flag.Parse()
 
-	//if *imageName == "" {
-	if *imageName == "" || *cloudWatchGroupName == "" || *cloudWatchStreamName == "" ||
-		*cloudWatchRegion == "" || *cloudWatchAccessKeyID == "" || *cloudWatchSecretAccessKey == "" {
+	if *imageName == "" {
 		fmt.Println("Cannot start without a docker image name")
 		return
 	}
